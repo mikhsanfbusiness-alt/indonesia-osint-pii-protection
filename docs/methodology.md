@@ -13,6 +13,32 @@ The method has six phases:
 5. Prioritize protection using the proposed IPCR score.
 6. Document remediation and close the assessment.
 
+## Workflow flowchart
+
+The flowchart follows the six phases below and routes unclear authorization or unsafe evidence encounters to stop and escalation.
+
+```mermaid
+flowchart TD
+    start([Start]) --> scope["1. Define purpose, scope, authority, permitted sources, evidence storage, and retention"]
+    scope --> authorization{"Are scope and authorization clear?"}
+    authorization -- "No" --> stop["Stop collection; clarify authorization or escalate"]
+    stop --> stopped([Stop])
+    authorization -- "Yes" --> categories["2. Record data categories and context, not raw identifier values"]
+    categories --> sources["3. Review approved sources; record source, time, supported facts, confidence, and limitations"]
+    sources --> restricted{"Did the review encounter suspected leaked records or restricted data?"}
+    restricted -- "Yes" --> protect["Do not download, test, or redistribute. Stop collection and escalate."]
+    protect --> safe["Use an official report, trusted notification, or controlled organizational confirmation if available"]
+    restricted -- "No" --> assess["4. Separate facts from assumptions; assess impact, confidence, evidenced scale, controls, and uncertainty"]
+    safe --> assess
+    assess --> score["5. Score each IPCR factor from 1 to 5; apply the minimum severity floor for known critical conditions"]
+    score --> tier["Assign proposed tier by score: P1 80–100; P2 65–79; P3 45–64; P4 25–44; P5 20–24. Raise it if a severity floor applies."]
+    tier --> report["6. Record a redacted finding, evidence, score, impact, owner, remediation date, and verification method"]
+    report --> review{"Does the quality review pass?"}
+    review -- "No" --> revise["Correct gaps and repeat the relevant assessment steps"]
+    revise --> sources
+    review -- "Yes" --> close([Publish or close the assessment])
+```
+
 ## 2. Phase 1: Scope and authorization
 
 Before beginning, document:
