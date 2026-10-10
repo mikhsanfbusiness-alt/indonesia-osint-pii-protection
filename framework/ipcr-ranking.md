@@ -1,59 +1,81 @@
 # Indonesia PII Criticality Ranking (IPCR)
 
-## Purpose
+## Purpose and scope
 
-The Indonesia PII Criticality Ranking (IPCR) is a proposed internal framework for helping an organization prioritize protection for personal data it processes. It is designed for defensive security, privacy risk assessment, and awareness activities in the Indonesian context.
+The Indonesia PII Criticality Ranking (IPCR) is a proposed internal framework for ranking the **inherent criticality of a data category or dataset** so an organization can choose proportionate safeguards.
 
-**IPCR is not an official Indonesian government classification and is not legal advice.** Use it alongside applicable laws, contracts, sector-specific requirements, and the organization's approved risk methodology.
+IPCR answers:
+
+> **If this data were mishandled, disclosed, or misused, how serious could the harm be given the data's sensitivity and context?**
+
+IPCR does **not** measure whether a breach is occurring, whether a system is exposed today, how many records are currently reachable, or whether existing security controls are effective. Assess those questions separately using the [Exposure Risk Model](exposure-risk-model.md).
+
+**IPCR is not an official Indonesian government classification, a legal category, or legal advice.** Use it alongside applicable law, sector-specific requirements, contracts, and an organization's approved risk methodology.
 
 ## Ranking levels
 
 | Level | Score | Meaning | Typical handling expectation |
 |---|---:|---|---|
-| **P1 — Critical** | 80–100 | Exposure could enable immediate compromise, severe harm, or widespread abuse. | Strictly restricted access; strong encryption; detailed audit logging; minimize copies and retention; incident escalation immediately. |
-| **P2 — Very High** | 65–79 | Data could materially enable identity fraud, serious privacy harm, or targeted abuse. | Need-to-know access; encryption; masking in routine views; controlled exports; periodic access review. |
-| **P3 — High** | 45–64 | Data could facilitate targeted scams, profiling, or harm when exposed or linked with other information. | Role-based access; secure transfer and storage; retention limits; monitored exports. |
-| **P4 — Moderate** | 25–44 | Standalone exposure may be less harmful, but context or linkage can increase risk. | Standard access controls; avoid unnecessary publication; monitor combinations and bulk exports. |
-| **P5 — Low** | 20–24 | Information has limited impact in the assessed context, often because it is intentionally public or has little identifying value alone. | Maintain basic safeguards and reassess if context changes. |
+| **P1 — Critical** | 80–100 | Mishandling could plausibly cause severe harm, direct compromise, or high-impact abuse, especially in sensitive combinations or vulnerable contexts. | Strictly restricted access; strong encryption; robust logging; minimize copies and retention; documented response plan. |
+| **P2 — Very High** | 65–79 | Data could materially enable identity fraud, significant privacy harm, financial abuse, or targeted exploitation. | Need-to-know access; encryption; masking in routine views; tightly controlled exports; access reviews. |
+| **P3 — High** | 45–64 | Data could enable targeted scams, profiling, or meaningful personal harm, particularly when linked with other information. | Role-based access; secure transfer and storage; retention limits; monitored exports. |
+| **P4 — Moderate** | 25–44 | Standalone data may have a more limited impact, but context and linkage can increase its significance. | Standard controlled access; avoid unnecessary publication; review combinations and bulk use. |
+| **P5 — Low** | 20–24 | Limited impact in the assessed context, often because information is intentionally public or has little identifying value alone. | Maintain basic safeguards; verify intended publication and reassess if context changes. |
 
-The score range begins at 20 because the five scoring factors each receive a minimum score of 1.
+The minimum score is 20 because four factors are each rated from 1 to 5. The ranking is a starting point—not an automatic legal classification or a promise that every instance of a field has the same risk.
 
-## Indonesian data examples (starting point only)
+## Data criticality factors
 
-The examples below are **not automatic legal or universal classifications**. Assign a score for the actual dataset, processing purpose, number of affected people, and surrounding controls.
+Score each factor from 1 (low) to 5 (very high) using the rationale in [`scoring-methodology.md`](scoring-methodology.md).
 
-| Data category | Starting consideration | Factors that may increase criticality |
+| Factor | Weight | What it means |
+|---|---:|---|
+| Sensitivity (`S`) | 6 | Intrinsic sensitivity of the data in the assessed context. |
+| Potential harm (`H`) | 6 | Severity of plausible harm if the data is mishandled or misused; do not score the likelihood of an incident here. |
+| Linkability (`L`) | 4 | How readily the data can identify, single out, or profile a person when considered with relevant information. |
+| Vulnerability/context (`V`) | 4 | Whether the subject population or context amplifies harm, for example children, dependent people, or safety-sensitive circumstances. |
+
+**Formula:**
+
+`IPCR = (S × 6) + (H × 6) + (L × 4) + (V × 4)`
+
+Minimum: **20**. Maximum: **100**.
+
+## Indonesian data examples — initial guidance only
+
+These are contextual starting points, not automatic or legally binding classifications. Score the actual fields, completeness, purpose, linkability, and potential harm.
+
+| Data category | Starting consideration | Factors that can increase criticality |
 |---|---|---|
-| Passwords, active session tokens, API keys, private keys | Often P1 if valid or exposed | Privileged access, production systems, reusable credentials, broad access |
-| NIK/KTP, KK number, identity document images | Often P2 or higher depending on context | Combined with full name, address, signature, date of birth, or other identifiers; bulk exposure |
-| Health records, biometric or genetic data | Often P2 or P1 for highly sensitive or bulk exposure | Scale, potential discrimination, medical detail, ease of re-identification |
-| Bank details, financial records, payment data | Context-dependent; P2 or higher where actionable | Credentials, transaction details, balances, authentication factors, bulk exposure |
-| NPWP and tax documents | Often P2–P3 depending on completeness and context | Identity documents, financial details, signatures, company authorization data |
-| BPJS/KPJ, employment and payroll records | Often P2–P3 depending on fields | Health, salary, bank details, government identifiers, bulk records |
-| Phone number, personal email, home address | Often P3–P4 alone | Combined with identifiers, security questions, stalking risk, large-scale exposure |
-| Vehicle plate number (nopol) | Context-dependent, often P4 alone | Linked to owner identity, home/work location, STNK/BPKB images, location patterns |
-| NIM/NISN, NIP, internal employee ID | Context-dependent, often P3–P4 | Children or vulnerable groups, linked records, authentication use, bulk exposure |
-| Public business contact address or role mailbox | May be P5 in the intended public context | Misconfiguration, internal routing details, or combination with nonpublic records |
+| Active passwords, session tokens, API keys, private keys | Treat active secrets as critical security assets; use the P1 floor where compromise enables meaningful access. Secrets are not necessarily PII, but still require strong protection. | Privileged access, production use, broad permissions, reusable credentials. |
+| NIK/KTP, KK number, identity document images | Often P2 or higher depending on completeness and context. | Combined with name, address, signature, date of birth, tax or financial data; bulk records; vulnerable subjects. |
+| Health, biometric, or genetic data | Often P2 or P1 depending on detail and consequences. | Highly detailed records, irreversible biometric exposure, discrimination or safety implications, identity linkage. |
+| Bank details, financial records, payment information | Context-dependent; often P2 or higher when actionable or richly detailed. | Credentials, authentication data, transactions, balances, linked identity records. |
+| NPWP and tax documents | Often P2–P3 depending on completeness and context. | Identity documents, financial details, signatures, company authorization data. |
+| BPJS/KPJ, employment and payroll records | Often P2–P3 depending on fields. | Health details, salary, bank details, government identifiers, vulnerable subjects. |
+| Phone number, personal email, home address | Often P3–P4 alone, depending on context. | Linked identity records, safety risks, account recovery details, mass datasets. |
+| Vehicle plate (nopol) | Context-dependent; often P4 alone. | Linked owner identity, home/work locations, STNK/BPKB images, location patterns. |
+| NIM/NISN, NIP, internal employee ID | Context-dependent; often P3–P4. | Children, linked academic/employment records, authentication use, detailed profiles. |
+| Public company contact mailbox or published role | May be P5 in its intended public context. | Internal routing details, unintentional disclosure, linkage to non-public personal information. |
 
 ## Classification principles
 
-1. **Classify the data in context, not by field name alone.** A vehicle plate alone is not equivalent to a plate plus owner address and document images.
-2. **Consider combinations.** Multiple low- or medium-risk fields can collectively create a high-risk identity profile.
-3. **Separate data criticality from incident severity.** Criticality describes the potential sensitivity and impact if mishandled; incident severity also depends on whether exposure occurred, exploitability, scale, and containment.
-4. **Use a minimum criticality floor.** Escalation rules can raise a score-based level when a clear high-risk condition exists.
-5. **Record uncertainty.** When evidence is incomplete, state assumptions and use a conservative temporary classification until reviewed.
-6. **Review periodically.** Reassess when processing purposes, systems, data combinations, threat conditions, or legal requirements change.
+1. **Classify in context, not by field name alone.** A standalone plate number is not equivalent to a plate linked to an owner's identity and home address.
+2. **Keep current safeguards out of IPCR.** Strong encryption or limited access can lower current exposure risk, but should not make inherently sensitive data appear less critical.
+3. **Keep exposure scale out of IPCR.** Record counts and the number of records plausibly exposed belong in the exposure-risk assessment. A large dataset may still require strong controls even when no exposure is known.
+4. **Consider combinations.** Multiple individually modest fields can form a high-criticality profile when combined.
+5. **Use overrides carefully.** A clear condition such as exposed active credentials can trigger a minimum handling requirement regardless of the arithmetic score. Document the reason.
+6. **Record uncertainty and review dates.** Reassess when purpose, data combinations, threat conditions, or legal requirements change.
 
-## Minimum record for each classification
+## Minimum classification record
 
-For every data asset or dataset, document:
+For every dataset or data flow, document:
 
-- Data category and purpose of processing
-- Whether the dataset contains direct identifiers, sensitive details, or authentication secrets
-- Approximate number of affected people or records (where known)
-- Linkability with other datasets
-- Storage location and authorized roles
-- IPCR factor scores and rationale
-- Assigned level, required controls, owner, and review date
+- Dataset/category name and purpose of processing (do not include actual identifiers).
+- Factors `S`, `H`, `L`, and `V`, with a short reason for each score.
+- IPCR total, assigned P1–P5 level, and any override.
+- Owner, system/location, authorized roles, and retention expectation.
+- Required protective controls and review date.
+- A separate exposure-risk assessment reference, if one exists.
 
-Do not put real NIK, KK numbers, account numbers, credentials, or other direct identifiers into the classification record. Use synthetic examples or non-identifying references.
+Never put real NIK, KK numbers, account numbers, credentials, or identity-document images into the public classification record.
