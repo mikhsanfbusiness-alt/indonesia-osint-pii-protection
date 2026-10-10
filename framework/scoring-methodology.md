@@ -1,79 +1,63 @@
-# IPCR Scoring Methodology
+# Scoring Methodology: Data Criticality vs Exposure Risk
 
-## Overview
+## Purpose
 
-Use this scoring model to support consistent internal prioritization. It is a proposed portfolio framework, not an official standard. Organizations should validate the factors and thresholds against their own risk appetite and applicable obligations.
+Use two independent scores to avoid confusing the importance of protecting data with the urgency of a current security exposure.
 
-## Factors and weights
+- **IPCR (P1–P5): data criticality.** How harmful could it be if this category or dataset were mishandled, disclosed, or misused, given its content and context? It does not score current controls, current exposure status, or the number of records affected by an incident.
+- **Exposure Risk (ER1–ER5): current exposure risk.** How serious is a known or credibly suspected exposure pathway, given evidence, plausible exposed scope, accessibility, control gaps, and indicators of misuse?
 
-Rate each factor from **1 (low)** to **5 (very high)**, then calculate the weighted total.
+These are proposed portfolio methods, not official government classifications. Organizations should validate thresholds and decisions against their own risk methodology and applicable obligations.
 
-| Factor | Weight | What to assess |
+## Model A — IPCR data criticality
+
+Rate each factor 1 (low) to 5 (very high):
+
+| Factor | Weight | Assessment question |
 |---|---:|---|
-| Sensitivity (`S`) | 6 | Potential privacy, safety, financial, or other harm if the data is exposed or misused |
-| Misuse potential (`M`) | 5 | How readily the data could support fraud, impersonation, account compromise, discrimination, or other abuse |
-| Exposure scale (`E`) | 4 | Number of people/records that could be affected, including whether the dataset is bulk or replicated |
-| Linkability (`L`) | 3 | How easily the data can be combined with other information to identify or profile people |
-| Control weakness (`C`) | 2 | Weakness in current safeguards, such as broad access, lack of encryption, exposed endpoints, or poor monitoring |
+| Sensitivity (`S`) | 6 | How sensitive is this type of information in this context? |
+| Potential harm (`H`) | 6 | How severe could the harm be if it were mishandled or misused? |
+| Linkability (`L`) | 4 | How readily could it identify, single out, or profile a person when combined with relevant information? |
+| Vulnerability/context (`V`) | 4 | Does the subject population or context amplify potential harm? |
 
-**Formula**
+`IPCR = (S × 6) + (H × 6) + (L × 4) + (V × 4)`
 
-`IPCR Score = (S × 6) + (M × 5) + (E × 4) + (L × 3) + (C × 2)`
+Score range: 20–100. Bands: 80–100 P1 Critical; 65–79 P2 Very High; 45–64 P3 High; 25–44 P4 Moderate; 20–24 P5 Low.
 
-Minimum score: **20**. Maximum score: **100**.
+Full definitions and Indonesian examples: [IPCR Ranking](ipcr-ranking.md).
 
-## Rating guide
+## Model B — Exposure Risk Score (ERS)
 
-| Rating | 1 — Low | 2 — Limited | 3 — Moderate | 4 — High | 5 — Very high |
-|---|---|---|---|---|---|
-| Sensitivity | Little personal impact | Limited contact/context data | Identifiable personal or work data | Strong identity, financial, or private-life impact | Authentication secrets, highly sensitive records, or potentially severe harm |
-| Misuse potential | Little practical abuse | Requires substantial additional information | Could support targeted scams | Enables credible fraud or identity abuse | Direct compromise, high-impact fraud, or severe abuse is plausible |
-| Exposure scale | One or very few records | Small, contained set | Multiple users or department | Large business unit/customer segment | Bulk, widespread, or unknown potentially large exposure |
-| Linkability | Not identifying in context | Difficult to link | Linkable with common information | Easily linked to identity or other records | Enables a detailed identity profile or re-identification |
-| Control weakness | Strong, reviewed controls | Minor gaps | Some missing controls | Weak access/monitoring or unnecessary copies | Publicly accessible, uncontrolled, or already confirmed exposed |
+Rate each factor 1 (low) to 5 (very high), based on evidence about the identified or suspected exposure pathway:
 
-Use the rating descriptions as prompts, not mechanical truth. Write a short evidence-based reason for every factor score. If record count or exposure is unknown, record that uncertainty rather than inventing a number.
+| Factor | Weight | Assessment question |
+|---|---:|---|
+| Exposure evidence/status (`E`) | 6 | How strong is the evidence that unauthorized exposure or access exists? |
+| Affected/reachable scope (`N`) | 5 | How many records or people are plausibly affected or reachable through this issue? |
+| Accessibility/exploitability (`A`) | 4 | How easily could an unauthorized party access or use the data through the identified path? |
+| Control/containment weakness (`C`) | 3 | How weak are relevant access, detection, and containment controls? |
+| Misuse/persistence indicators (`M`) | 2 | Is there credible evidence of attempted or ongoing misuse or continued access? |
 
-## Score bands
+`ERS = (E × 6) + (N × 5) + (A × 4) + (C × 3) + (M × 2)`
 
-| Total score | IPCR level |
-|---:|---|
-| 80–100 | P1 — Critical |
-| 65–79 | P2 — Very High |
-| 45–64 | P3 — High |
-| 25–44 | P4 — Moderate |
-| 20–24 | P5 — Low |
+Score range: 20–100. Bands: 80–100 ER1 Critical; 65–79 ER2 Very High; 45–64 ER3 High; 25–44 ER4 Moderate; 20–24 ER5 Low.
 
-## Worked example (synthetic)
+Factor scales, evidence limits, examples, and overrides: [Exposure Risk Model](exposure-risk-model.md).
 
-Scenario: a fictional company stores employee contact details with work records. The dataset does not include identity-document images, authentication secrets, or health information. Some fields can be linked to publicly available professional information.
+## Why the two scores must stay separate
 
-- Sensitivity: `S = 3`
-- Misuse potential: `M = 3`
-- Exposure scale: `E = 3`
-- Linkability: `L = 3`
-- Control weakness: `C = 2`
+- A dataset of tax and payroll records may be **IPCR P2** even when no exposure is known and safeguards have been validated, resulting in a low current exposure-risk score. The data still requires strong baseline controls.
+- A lower-criticality dataset may have **ER1** if a confirmed public exposure affects many people or is being actively abused.
+- Strong controls should affect exposure risk, not reduce the inherent criticality assigned to the data.
+- A large record count should affect plausible exposure scope, not automatically raise the intrinsic criticality of every record.
 
-Calculation: `(3×6) + (3×5) + (3×4) + (3×3) + (2×2) = 56` → **P3 — High**.
+**Do not add, average, multiply, or collapse IPCR and ERS into one score.** Use the two-dimensional decision guidance in [`risk-escalation-rules.md`](risk-escalation-rules.md) and assess incident status separately.
 
-This example is illustrative. A real assessment could score differently based on the actual fields, number of records, context, and controls.
+## Evidence and quality safeguards
 
-## Criticality floor and overrides
-
-The weighted score must not reduce a clearly severe case. At minimum, review for these overrides:
-
-- Valid credentials, active tokens, private keys, or secrets exposed: treat as **P1 until invalidated and investigated**.
-- Confirmed large-scale exposure of highly sensitive data: consider **P1**, with immediate incident assessment.
-- Full identity-document packages or combinations that materially enable identity fraud: normally no lower than **P2**, unless a documented review justifies otherwise.
-- Data involving children, vulnerable people, safety risks, or sensitive context: escalate for specialist review; do not rely on score alone.
-- Confirmed exposure or evidence of active exploitation: assign incident severity separately and trigger the incident response process.
-
-Document any override, its rationale, approver, and date.
-
-## Good scoring practice
-
-- Score a clearly defined dataset or data flow, not an entire company vaguely.
-- Use actual controls and available evidence, not assumptions.
-- Distinguish inherent criticality from residual risk after controls.
-- Ask a data owner or privacy/security reviewer to validate material decisions.
-- Reassess after major changes, incidents, or at least on the organization's review cycle.
+- Score a defined dataset, data flow, or exposure path—not a whole company vaguely.
+- Provide a brief evidence-based reason for every factor score.
+- Never access, download, or test real leaked records solely to improve a score. Use approved internal evidence, official notices, or reputable incident reporting.
+- If scale is unknown, record it as unknown. Use a conservative provisional value only where evidence supports a plausible wider exposure, and explain the assumption.
+- A score is not a legal determination, proof of a breach, or a decision that statutory notification can be ignored.
+- Document the reviewer, date, assumptions, overrides, owner, and reassessment trigger.
